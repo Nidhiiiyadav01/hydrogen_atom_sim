@@ -67,6 +67,15 @@ Ground state energy: -2.5673 eV
 ## Notes
 - Ensure that your MATLAB environment has access to necessary toolboxes for plotting.
 - Adjust parameters such as `r_min`, `r_max`, and `N_r` for different resolutions or ranges if needed.
-  
+ 
 ## Conclusion
 This simulation provides an insightful view into quantum mechanics, illustrating how quantum states can be computed and visualized for simple atomic systems like hydrogen. Feel free to modify and expand upon this code for further exploration!
+
+## Acknowledgments
+
+Thanks to the following contributors for their support:
+
+- [Nidhiiiyadav01](https://github.com/Nidhiiiyadav01)
+- [Yogita-collab](https://github.com/Yogita-collab)
+- [yashasvirani15](https://github.com/yashasvirani15)
+- [Shreyasoni-297](https://github.com/Shreyasoni-297)
