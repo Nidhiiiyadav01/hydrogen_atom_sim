@@ -1,33 +1,71 @@
-# Project Overview
+# Hydrogen Atom Ground State Simulation
 
-The project we're working on focuses on solving the **Schrödinger time-independent equation**, a fundamental equation in quantum mechanics. This equation is essential for understanding the behavior of particles (like atoms and molecules) at the smallest, quantum level.
+## Overview
+This MATLAB script simulates the ground state of a hydrogen atom using quantum mechanics principles. It calculates the wavefunctions and energy levels of the hydrogen atom, specifically focusing on the 1s orbital. The script also visualizes the probability density of the ground state wavefunction and provides a 3D representation of the orbital shape.
 
-To explain it simply, imagine you have a ball that you're trying to understand. The Schrödinger equation tells us about the different ways the ball can move and where it's most likely to be found. In our case, instead of a ball, we're examining the behavior of the hydrogen atom, which serves as a model for understanding more complex atomic systems.
+## Contents
+- Constants and Parameters
+- Hamiltonian Construction
+- Eigenvalue Problem
+- Probability Density Calculation
+- Plotting Results
+- 3D Visualization of Orbital Shape
 
-## Key Components
+## Requirements
+- MATLAB (version R2016a or later recommended)
+- Basic understanding of quantum mechanics and linear algebra
 
-1. **Radial Equation**: This part of the Schrödinger equation helps us understand how the probability of finding an electron changes as you move outward from the center of an atom. For the hydrogen atom, we can visualize this by imagining it as a tiny solar system, with the nucleus at the center and the electron orbiting around it. The radial equation tells us about the likelihood of finding an electron at different distances from the nucleus.
+## Usage Instructions
 
-2. **Orbital Shapes**: The solutions to the Schrödinger time-independent equation reveal various shapes that an electron's probability distribution can take, such as spheres (s orbitals), dumbbells (p orbitals), and more complex shapes (d and f orbitals). These shapes are crucial for understanding how atoms and molecules interact with each other.
+1. **Run the Script**: Open MATLAB and copy the provided code into a new script file `Atom.m`. Run the script to perform the calculations and generate plots.
 
-## Visualization
+2. **View Results**:
+   - The ground state energy will be printed in both Joules and electronvolts (eV).
+   - A plot showing the probability density of the ground state orbital will be displayed.
+   - A 3D surface plot representing the shape of the hydrogen atom's ground state orbital will also be generated.
 
-To help visualize these concepts, our project includes functions that can generate 3D plots of the electron probability distributions for different types of orbitals in the hydrogen atom. For example:
+## Code Breakdown
 
-- The **1s orbital** looks like a smooth, spherical cloud around the nucleus.
-- The **2p orbital** has a dumbbell-like shape, with two distinct lobes.
-- The **3d orbital** features an even more complex shape, with multiple lobes and intricate structures.
+### Constants and Parameters
+The script defines several physical constants and parameters necessary for calculations:
+- `hbar`: Reduced Planck's constant (J.s)
+- `e`: Elementary charge (C)
+- `epsilon0`: Vacuum permittivity (F/m)
+- `m_e`: Mass of an electron (kg)
+- `mu`: Reduced mass for the electron-proton system
+- Radial grid defined by `r_min`, `r_max`, and `N_r`.
 
-By visualizing these shapes, we can better understand how electrons behave within atoms and how atoms can form bonds to create molecules.
+### Hamiltonian Construction
+The Hamiltonian operator is constructed using:
+- Kinetic energy term (`H_kinetic`)
+- Potential energy term (`H_potential`), which is derived from Coulomb's law.
 
-## Results
+### Eigenvalue Problem
+The eigenvalues and eigenvectors of the Hamiltonian are computed using MATLAB's built-in `eig` function. The energies are sorted, and the ground state wavefunction is normalized.
 
-Here is a visual representation of our findings:
+### Probability Density Calculation
+The probability density is calculated from the normalized wavefunction, which represents the likelihood of finding an electron in a given region around the nucleus.
 
-![Electron Probability Distribution](results/result.jpg)
+### Plotting Results
+The script generates two plots:
+1. A 2D plot of the probability density as a function of radius.
+2. A 3D surface plot visualizing the shape of the ground state orbital.
 
-This image illustrates one of the key orbital shapes we've studied for the hydrogen atom, providing insight into the spatial distribution of electron probabilities around it.
+## Output
+Upon execution, you will see:
+- Ground state energy printed in Joules and eV.
+- A graph displaying the probability density.
+- A 3D plot illustrating the orbital shape.
 
+## Example Output
+```
+Ground state energy: -2.1799e-18 J
+Ground state energy: -13.6056 eV
+```
+
+## Notes
+- Ensure that your MATLAB environment has access to necessary toolboxes for plotting.
+- Adjust parameters such as `r_min`, `r_max`, and `N_r` for different resolutions or ranges if needed.
+  
 ## Conclusion
-
-Understanding the Schrödinger time-independent equation and its implications.
+This simulation provides an insightful view into quantum mechanics, illustrating how quantum states can be computed and visualized for simple atomic systems like hydrogen. Feel free to modify and expand upon this code for further exploration!
