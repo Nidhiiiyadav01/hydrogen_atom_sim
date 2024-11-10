@@ -1,100 +1,68 @@
-classdef Atom
-    properties
-        Z                % Atomic number of the atom
-        basisParams      % Basis function parameters (exponents) for each orbital
-        orbitalIndices   % Orbital indices and quantum numbers [n, l]
-        H                % Hamiltonian matrix
-        S                % Overlap matrix
-        C                % Coefficients matrix
-        E                % Energy eigenvalues
-    end
-    
-    methods
-        % Constructor to initialize the atom with atomic number and orbital basis parameters
-        function obj = Atom(Z, basisParams, orbitalIndices)
-            obj.Z = Z;
-            obj.basisParams = basisParams;
-            obj.orbitalIndices = orbitalIndices;
-            obj.H = [];  % Initialize Hamiltonian matrix
-            obj.S = [];  % Initialize Overlap matrix
-            obj.C = [];  % Initialize coefficient matrix for orbitals
-            obj.E = [];  % Initialize energy eigenvalues
-        end
-        
-        % Function to calculate overlap integral for atomic orbitals
-        function S = overlap_integral(~, alpha1, alpha2)
-            S = (pi / (alpha1 + alpha2))^(3/2);
-        end
-        
-        % Function to calculate Hamiltonian integral (kinetic + nuclear attraction)
-        function H = hamiltonian_integral(obj, alpha1, alpha2)
-            S = obj.overlap_integral(alpha1, alpha2);
-            H = S * (-alpha1 * alpha2 / (alpha1 + alpha2) + obj.Z);
-        end
-        
-        % Build Hamiltonian and Overlap matrices for atomic orbitals
-        function obj = build_matrices(obj)
-            numOrbitals = length(obj.basisParams);
-            obj.H = zeros(numOrbitals, numOrbitals);
-            obj.S = zeros(numOrbitals, numOrbitals);
-            
-            for i = 1:numOrbitals
-                for j = 1:numOrbitals
-                    obj.S(i, j) = obj.overlap_integral(obj.basisParams(i), obj.basisParams(j));
-                    obj.H(i, j) = obj.hamiltonian_integral(obj.basisParams(i), obj.basisParams(j));
-                end
-            end
-        end
-        
-        % Solve the generalized eigenvalue problem for H and S matrices
-        function obj = solve_eigenproblem(obj)
-            [obj.C, D] = eig(obj.H, obj.S);
-            obj.E = diag(D); % Eigenvalues (orbital energies)
-        end
-        
-        % Visualize atomic orbital based on quantum numbers (n, l)
-        function visualize_orbital(obj, orbital_index, grid_size, grid_range)
-            x = linspace(-grid_range, grid_range, grid_size);
-            y = linspace(-grid_range, grid_range, grid_size);
-            z = linspace(-grid_range, grid_size, grid_size);
-            [X, Y, Z] = meshgrid(x, y, z);
-            
-            orbital_density = zeros(size(X));
-            for i = 1:length(obj.basisParams)
-                orbital_density = orbital_density + obj.C(i, orbital_index) * obj.gaussian_basis(X, Y, Z, obj.basisParams(i));
-            end
-            orbital_density = orbital_density .^ 2; % Probability density
-            
-            isovalue = max(orbital_density(:)) * 0.1;
-            figure;
-            h = patch(isosurface(X, Y, Z, orbital_density, isovalue));
-            isonormals(X, Y, Z, orbital_density, h);
-            set(h, 'FaceColor', 'cyan', 'EdgeColor', 'none');
-            xlabel('x'); ylabel('y'); zlabel('z');
-            orbital_name = obj.get_orbital_name(orbital_index);
-            title(sprintf('Atomic Orbital %s Visualization', orbital_name));
-            axis equal; view(3); camlight; lighting gouraud;
-            colorbar;
-        end
-        
-        % Get the orbital name based on its quantum numbers
-        function orbital_name = get_orbital_name(obj, orbital_index)
-            n = obj.orbitalIndices(orbital_index, 1);
-            l = obj.orbitalIndices(orbital_index, 2);
-            subshells = ['s', 'p', 'd', 'f', 'g', 'h'];
-            if l + 1 <= length(subshells)
-                orbital_name = sprintf('%d%s', n, subshells(l + 1));
-            else
-                orbital_name = sprintf('%d?', n); % Placeholder if l is out of bounds
-            end
-        end
-    end
-    
-    methods (Static)
-        % Gaussian basis function (s-type orbital)
-        function val = gaussian_basis(x, y, z, alpha)
-            r2 = x.^2 + y.^2 + z.^2;
-            val = exp(-alpha * r2);
-        end
-    end
-end
+% Constants
+hbar = 1.055e-34; % Planck's constant (J.s)
+e = 1.602e-19; % Elementary charge (C)
+epsilon0 = 8.854e-12; % Vacuum permittivity (F/m)
+m_e = 9.109e-31; % Electron mass (kg)
+
+mu = m_e / 2; % Reduced mass
+r_min = 1e-10; % Minimum radius (m)
+r_max = 20e-10; % Maximum radius (m)
+N_r = 500; % Number of radial points
+r = linspace(r_min, r_max, N_r); % Radial grid
+
+V = -e^2 ./ (4 * pi * epsilon0 * r); % Coulomb potential
+
+h = r(2) - r(1); % Step size
+T = -hbar^2 / (2 * mu * h^2);
+H_kinetic = diag(-2 * ones(N_r, 1)) + diag(ones(N_r-1, 1), 1) + diag(ones(N_r-1, 1), -1);
+H_kinetic = T * H_kinetic;
+
+H_potential = diag(V);
+H = H_kinetic + H_potential;
+
+[eigenvectors, eigenvalues] = eig(H);
+energies = diag(eigenvalues);
+
+[energies, idx] = sort(energies);
+wavefunctions = eigenvectors(:, idx);
+
+psi_ground = wavefunctions(:, 1);
+psi_ground_normalized = psi_ground / sqrt(trapz(r, abs(psi_ground).^2));
+
+probability_density = abs(psi_ground_normalized).^2;
+
+% Plotting the probability density
+figure;
+plot(r, probability_density, 'LineWidth', 2);
+xlabel('Radius (m)');
+ylabel('Probability Density');
+title('Hydrogen Atom Ground State Orbital (1s)');
+grid on;
+
+fprintf('Ground state energy: %.4e J\n', energies(1));
+fprintf('Ground state energy: %.4f eV\n', energies(1) / e);
+
+% Visualization of the orbital shape
+% Create a meshgrid for spherical coordinates
+theta = linspace(0, pi, 50);
+phi = linspace(0, 2*pi, 50);
+[Theta, Phi] = meshgrid(theta, phi);
+
+% Calculate the radial part for the ground state (1s orbital)
+R_1s = (1/sqrt(pi)) * exp(-r_min); % Normalized radial wave function for 1s
+
+% Convert spherical coordinates to Cartesian
+X = R_1s * sin(Theta) .* cos(Phi);
+Y = R_1s * sin(Theta) .* sin(Phi);
+Z = R_1s * cos(Theta);
+
+% Plotting the orbital shape
+figure;
+surf(X, Y, Z, 'EdgeColor', 'none');
+xlabel('X');
+ylabel('Y');
+zlabel('Z');
+title('3D Plot of Hydrogen Atom Ground State Orbital (1s)');
+axis equal;
+view(30, 30); % Adjust view angle for better visualization
+colorbar;
