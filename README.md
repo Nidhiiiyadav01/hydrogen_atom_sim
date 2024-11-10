@@ -59,10 +59,11 @@ Upon execution, you will see:
 
 ## Example Output
 ```
-Ground state energy: -2.1799e-18 J
-Ground state energy: -13.6056 eV
+Ground state energy: -4.1128e-19 J
+Ground state energy: -2.5673 eV
 ```
-
+![plot1](results/plot1.png)
+![plot2](results/plot2.png)
 ## Notes
 - Ensure that your MATLAB environment has access to necessary toolboxes for plotting.
 - Adjust parameters such as `r_min`, `r_max`, and `N_r` for different resolutions or ranges if needed.
